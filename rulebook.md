@@ -1,7 +1,7 @@
 # AIOps Soft Remediation Rulebook
 
 **Version:** 0.1 (draft)
-**Scope:** Docker / local Kubernetes sandbox only. Never run against a real cloud account.
+**Scope:** Docker / local Kubernetes sandbox only.
 **Used by:** the AI agent (retrieved through RAG), engineers, and reviewers.
 
 ---
