@@ -1,4 +1,4 @@
-# AIOps Soft Remediation Rulebook
+# Public Infrastructure: Smart Maintenance Planner Soft Remediation Rulebook
 
 **Version:** 0.1 (draft)
 **Scope:** Docker / local Kubernetes sandbox only.
