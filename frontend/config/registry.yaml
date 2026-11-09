@@ -1,0 +1,36 @@
+# ---------------------------------------------------------------------------
+# SERVICE REGISTRY = business context for each asset (this is configuration, not telemetry).
+# All live numbers (traffic, errors, latency, CPU, memory) come from Prometheus.
+#
+#   downtime_cost_per_min : money lost per minute if the service is fully down  (ASSUMPTION - replace with the
+#                           stakeholder's real figures)
+#   impact                : 0..1 how badly users/the public are harmed when it fails (reach x harm) (ASSUMPTION)
+#   depends_on            : real call dependencies of the OpenTelemetry demo (verify against your demo version)
+#   zone                  : logical deployment zone used on the map (the demo itself runs on one host)
+#   container             : docker container name (defaults to the service name)
+# ---------------------------------------------------------------------------
+zones:
+  "Zone North":  {lat: 28.6139, lon: 77.2090}
+  "Zone West":   {lat: 19.0760, lon: 72.8777}
+  "Zone South":  {lat: 12.9716, lon: 77.5946}
+  "Zone East":   {lat: 22.5726, lon: 88.3639}
+
+services:
+  frontend-proxy:  {kind: app,   downtime_cost_per_min: 5000, impact: 1.00, zone: "Zone North", depends_on: [frontend]}
+  frontend:        {kind: app,   downtime_cost_per_min: 5000, impact: 1.00, zone: "Zone North", depends_on: [ad, cart, checkout, currency, product-catalog, recommendation, shipping, image-provider]}
+  checkout:        {kind: app,   downtime_cost_per_min: 8000, impact: 0.90, zone: "Zone West",  depends_on: [cart, currency, email, payment, product-catalog, shipping, kafka]}
+  payment:         {kind: app,   downtime_cost_per_min: 8000, impact: 0.90, zone: "Zone West",  depends_on: []}
+  cart:            {kind: app,   downtime_cost_per_min: 4000, impact: 0.70, zone: "Zone West",  depends_on: [valkey-cart]}
+  product-catalog: {kind: app,   downtime_cost_per_min: 3500, impact: 0.80, zone: "Zone South", depends_on: [postgresql]}
+  currency:        {kind: app,   downtime_cost_per_min: 1500, impact: 0.50, zone: "Zone South", depends_on: []}
+  shipping:        {kind: app,   downtime_cost_per_min: 1500, impact: 0.50, zone: "Zone East",  depends_on: [quote]}
+  quote:           {kind: app,   downtime_cost_per_min: 500,  impact: 0.30, zone: "Zone East",  depends_on: []}
+  recommendation:  {kind: app,   downtime_cost_per_min: 800,  impact: 0.30, zone: "Zone South", depends_on: [product-catalog]}
+  ad:              {kind: app,   downtime_cost_per_min: 500,  impact: 0.15, zone: "Zone North", depends_on: []}
+  email:           {kind: app,   downtime_cost_per_min: 400,  impact: 0.30, zone: "Zone East",  depends_on: []}
+  accounting:      {kind: app,   downtime_cost_per_min: 600,  impact: 0.20, zone: "Zone East",  depends_on: [kafka, postgresql]}
+  fraud-detection: {kind: app,   downtime_cost_per_min: 1200, impact: 0.30, zone: "Zone East",  depends_on: [kafka]}
+  image-provider:  {kind: app,   downtime_cost_per_min: 600,  impact: 0.40, zone: "Zone North", depends_on: []}
+  kafka:           {kind: infra, downtime_cost_per_min: 1500, impact: 0.40, zone: "Zone East",  depends_on: []}
+  valkey-cart:     {kind: infra, downtime_cost_per_min: 3000, impact: 0.70, zone: "Zone West",  depends_on: []}
+  postgresql:      {kind: infra, downtime_cost_per_min: 2500, impact: 0.80, zone: "Zone South", depends_on: []}
