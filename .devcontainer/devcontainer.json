@@ -1,0 +1,15 @@
+{
+  "name": "Smart Maintenance Planner",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "forwardPorts": [8080, 9090, 8501],
+  "portsAttributes": {
+    "8080": {"label": "Demo shop / flags / loadgen"},
+    "9090": {"label": "Prometheus"},
+    "8501": {"label": "Streamlit control room"}
+  },
+  "hostRequirements": {"cpus": 4, "memory": "16gb"},
+  "postCreateCommand": "pip install -r frontend/requirements.txt"
+}

@@ -1,0 +1,50 @@
+# ---------------------------------------------------------------
+# Frontend settings. Environment variables (see .env.example) override these.
+# ---------------------------------------------------------------
+mode: local                      # local = read Prometheus directly | api = use the FastAPI backend
+prometheus_url: http://localhost:9090
+api_url: http://localhost:8000/api/v1
+refresh_seconds: 30              # live panels refresh interval
+step_seconds: 60                 # the OTel demo exports metrics about once a minute
+baseline_minutes: 60             # "normal behaviour" window used for comparison
+window_minutes: 5                # current window
+history_minutes: 90              # how much history is pulled per refresh
+currency: INR
+
+service_label: service_name      # Prometheus label that holds the service name
+container_label: container_name  # label for docker-stats metrics
+
+thresholds:
+  modified_z: 3.5                # Iglewicz-Hoaglin outlier threshold on median/MAD
+  error_ratio_slo: 0.02          # 2% errors = SLO breach
+  open_severity: 0.40            # incident opens at or above this severity
+  close_severity: 0.20           # incident closes when below this for confirm_points checks
+  confirm_points: 2
+  breach_horizon_minutes: 30     # a predicted breach sooner than this counts as proactive
+  status_cutoffs: {critical: 0.75, high: 0.50, medium: 0.30, low: 0.15}
+
+sla_response_minutes:            # target time from detection to a decision
+  critical: 15
+  high: 60
+  medium: 240
+  low: 1440
+
+automation:
+  default_mode: approve_each     # suggest_only | approve_each | auto_within_limits
+
+executor:                        # sandbox remediation (docker compose + feature flags)
+  enabled: false                 # must be switched on explicitly (see docs)
+  demo_dir: ""                   # path of the cloned opentelemetry-demo (docker compose project)
+  compose_file: ""               # e.g. docker-compose.minimal.yml if you started the demo in minimal mode
+  max_actions_per_service_per_hour: 3
+  command_timeout_seconds: 120
+
+lab:                             # scenario injection (feature-flag file of the demo)
+  flagd_file: ""                 # defaults to <demo_dir>/src/flagd/demo.flagd.json
+
+links:                           # shown in Scenario Lab
+  shop: http://localhost:8080/
+  feature_flags: http://localhost:8080/feature
+  load_generator: http://localhost:8080/loadgen/
+  jaeger: http://localhost:8080/jaeger/ui/
+  prometheus: http://localhost:9090

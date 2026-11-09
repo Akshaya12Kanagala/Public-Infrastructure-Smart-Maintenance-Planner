@@ -1,0 +1,71 @@
+# ---------------------------------------------------------------------------
+# Scenario catalogue for the Scenario Lab.
+# Every scenario is switched on with a REAL feature flag of the OpenTelemetry demo (src/flagd/demo.flagd.json).
+# Flag names and variants change between demo versions: the Lab validates them against your flag file.
+# "analog" = the class of real-world production incident the scenario imitates.
+# ---------------------------------------------------------------------------
+scenarios:
+  - id: flood
+    name: Traffic flood on the storefront
+    flag: loadGeneratorFloodHomepage
+    variant: "on"
+    analog: "Flash crowd or application-layer DoS: sales-day surge, exam-result day, abusive traffic"
+    services: [frontend-proxy, frontend]
+    expected_signals: "Request rate far above baseline, rising latency, CPU on the front tier"
+    runbook: RB-101
+  - id: cart-errors
+    name: Cart service failing after a bad change
+    flag: cartFailure
+    variant: "50%"
+    analog: "Faulty release or config push raising the error rate of a dependency (same class as the July 2024 faulty-update outage)"
+    services: [cart, checkout, frontend]
+    expected_signals: "Error ratio on cart and its callers, checkout failures"
+    runbook: RB-102
+  - id: payment-errors
+    name: Payment failures
+    flag: paymentFailure
+    variant: "50%"
+    analog: "Payment provider or gateway returning errors for part of the traffic; revenue-critical path"
+    services: [payment, checkout]
+    expected_signals: "Error ratio on payment and checkout"
+    runbook: RB-102
+  - id: payment-down
+    name: Payment service unreachable
+    flag: paymentUnreachable
+    variant: "on"
+    analog: "Dependency unreachable, as in a network partition (compare the October 2018 GitHub database failover incident)"
+    services: [payment, checkout]
+    expected_signals: "Payment traffic disappears while checkout errors rise"
+    runbook: RB-103
+  - id: ad-cpu
+    name: CPU exhaustion in the ad service
+    flag: adHighCpu
+    variant: "on"
+    analog: "Runaway computation saturating CPU (compare the July 2019 CDN outage caused by a regular expression that backtracked)"
+    services: [ad]
+    expected_signals: "CPU of the ad container far above baseline, latency of ad requests"
+    runbook: RB-104
+  - id: email-leak
+    name: Memory leak in the email service
+    flag: emailMemoryLeak
+    variant: "100x"
+    analog: "Slow memory growth ending in out-of-memory restarts, a classic after a code change"
+    services: [email]
+    expected_signals: "Memory of the email container grows steadily"
+    runbook: RB-105
+  - id: image-slow
+    name: Slow image loading
+    flag: imageSlowLoad
+    variant: "5sec"
+    analog: "Degraded static-content or CDN performance making pages slow without errors"
+    services: [frontend, image-provider]
+    expected_signals: "Latency rises, error ratio stays low"
+    runbook: RB-106
+  - id: kafka-lag
+    name: Order queue consumer falling behind
+    flag: kafkaQueueProblems
+    variant: "3sec"
+    analog: "Consumer lag and growing backlog on a message queue (full demo only; not available in minimal mode)"
+    services: [fraud-detection, kafka, accounting]
+    expected_signals: "Consumer lag grows (check the Metric Explorer for the Kafka lag metric of your demo version)"
+    runbook: RB-107
